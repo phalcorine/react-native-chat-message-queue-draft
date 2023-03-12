@@ -1,4 +1,4 @@
-import { ChatMessageResource } from "../models/Resources";
+import { ChatMessageResource } from "./models/Resources";
 import { ConnectivityManager } from "./Connectivity";
 import { getRandomBoolean } from "./Randomizer";
 import { AppStore } from "./Store";
