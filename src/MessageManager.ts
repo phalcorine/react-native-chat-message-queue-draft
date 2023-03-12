@@ -20,8 +20,8 @@ export class MessageManager {
     private failedQueue: ChatMessageEnvelope[] = [];
 
     constructor(
-        private readonly connectivityManager: ConnectivityManager,
-        private readonly appStore: AppStore,
+        private readonly connectivityManager: ConnectivityManager = new ConnectivityManager(),
+        private readonly appStore: AppStore = new AppStore(),
     ) {
         console.log("MessageManager has just been initialized!");
         this.init();
@@ -31,7 +31,7 @@ export class MessageManager {
         this.connectivityManager.subscribe((isConnected: boolean) => {
             if (isConnected) {
                 const messagesInQueue = this.mainQueue.length;
-                console.log(`Network is back!. Total messages in queue: ${messagesInQueue}...`);
+                // console.log(`Network is back!. Total messages in queue: ${messagesInQueue}...`);
                 if (messagesInQueue > 0) {
                     this.runMainQueue()
                         .then(() => console.log("Just ran the queue..."));
@@ -41,7 +41,7 @@ export class MessageManager {
     }
 
     async sendMessage(messageResource: ChatMessageResource) {
-        const messageSent = await Promise.resolve(messageResource.processMessage());
+        const messageSent = await Promise.resolve(messageResource.processMessage);
         if (!messageSent) {
             console.log(`${this.loggerName} - Message [${messageResource.client_message_uid}] not sent!`);
             this.mainQueue.push({

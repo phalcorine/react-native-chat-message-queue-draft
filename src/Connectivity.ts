@@ -18,7 +18,7 @@ export class ConnectivityManager {
 
             const isConnected = !isAirplaneMode && networkState.isInternetReachable;
             DeviceEventEmitter.emit(EVENT_INTERNET_CONNECTIVITY_CHANGED, isConnected);
-        }, 5000);
+        }, 50000);
     }
 
     subscribe(subscriber: (event: any) => void) {
