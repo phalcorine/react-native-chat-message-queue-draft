@@ -4,7 +4,7 @@ import { getRandomBoolean } from "./Randomizer";
 import { AppStore } from "./Store";
 
 export interface ChatMessageEnvelope {
-    message: ChatMessageResource;
+    messageResource: ChatMessageResource;
     retries: number;
     last_attempt_timestamp?: number;
     last_attempt_datetime?: Date;
@@ -28,9 +28,8 @@ export class MessageManager {
     }
 
     private init() {
-        this.connectivityManager.subscribe((payload: boolean) => {
-            // console.log("Payload for Event: ", payload);
-            if (payload) {
+        this.connectivityManager.subscribe((isConnected: boolean) => {
+            if (isConnected) {
                 const messagesInQueue = this.mainQueue.length;
                 console.log(`Network is back!. Total messages in queue: ${messagesInQueue}...`);
                 if (messagesInQueue > 0) {
@@ -41,20 +40,19 @@ export class MessageManager {
         })
     }
 
-    async sendMessage(message: ChatMessageResource) {
-        // Fake sending of message to API...
-        const messageSent = getRandomBoolean();
+    async sendMessage(messageResource: ChatMessageResource) {
+        const messageSent = await Promise.resolve(messageResource.processMessage());
         if (!messageSent) {
-            console.log(`${this.loggerName} - Message [${message.content}] not sent!`);
+            console.log(`${this.loggerName} - Message [${messageResource.client_message_uid}] not sent!`);
             this.mainQueue.push({
-                message,
+                messageResource: messageResource,
                 retries: 0,
             });
         } else {
-            console.log(`${this.loggerName} - Message [${message.content}] sent!`);
+            console.log(`${this.loggerName} - Message [${messageResource.client_message_uid}] sent!`);
             // update store...
-            this.appStore.updateMessageById(message.client_message_uid, {
-                ...message,
+            this.appStore.updateMessageById(messageResource.client_message_uid, {
+                ...messageResource,
                 sent: true,
             });
         }
@@ -62,8 +60,7 @@ export class MessageManager {
 
     private async runMainQueue() {
         const meow = await Promise.resolve(this.mainQueue.map(async (envelope) => {
-            // Fake sending of message to API...
-            const messageSent = getRandomBoolean();
+            const messageSent = await Promise.resolve(envelope.messageResource.processMessage());
             if (!messageSent) {
                 const now = new Date();
                 this.failedQueue.push({
@@ -73,9 +70,8 @@ export class MessageManager {
                     last_attempt_datetime: now,
                 });
             } else {
-                // update store...
-                this.appStore.updateMessageById(envelope.message.client_message_uid, {
-                    ...envelope.message,
+                this.appStore.updateMessageById(envelope.messageResource.client_message_uid, {
+                    ...envelope.messageResource,
                     sent: true,
                 });
             }

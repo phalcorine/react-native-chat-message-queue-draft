@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import { ChatMessageResource } from "../models/Resources";
+import { ChatMessageResource } from "./models/Resources";
 
 const EVENT_STORE_DATA_CHANGED = 'event-store-data-changed';
 
