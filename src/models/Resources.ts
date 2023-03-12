@@ -4,9 +4,7 @@ export interface UserResource {
 }
 
 export interface ChatMessageResource {
+    processMessage(): Promise<boolean>;
     client_message_uid: string;
-    recipient_uid: string;
-    sender_uid: string;
-    content: string;
     sent: boolean;
 }
