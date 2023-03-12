@@ -19,6 +19,5 @@
     "@babel/core": "^7.20.0",
     "@types/react": "^18.0.28",
     "@types/react-native": "^0.71.3"
-  },
-  "private": true
+  }
 }
